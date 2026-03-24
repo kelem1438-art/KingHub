@@ -2,141 +2,136 @@ repeat task.wait() until game:IsLoaded()
 repeat task.wait() until game.Players.LocalPlayer.Character
 
 local player = game.Players.LocalPlayer
+local Players = game:GetService("Players")
 local PlayerGui = player:WaitForChild("PlayerGui")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
 
 -- KÖHNƏLƏRİ SİL
 for _, v in pairs(PlayerGui:GetChildren()) do
-    if v.Name == "KingHubCustom" then
-        v:Destroy()
-    end
+    if v.Name == "KingHubCustom" then v:Destroy() end
 end
 
-local ScreenGui = Instance.new("ScreenGui")
+local ScreenGui = Instance.new("ScreenGui", PlayerGui)
 ScreenGui.Name = "KingHubCustom"
-ScreenGui.Parent = PlayerGui
 
--- PANEL ÖLÇÜSÜ (BURDAN DƏYİŞ)
-local PANEL_WIDTH = 360
-local PANEL_HEIGHT = 320
+-- =========================
+-- OPEN ANIMATION
+-- =========================
 
+local Intro = Instance.new("TextLabel", ScreenGui)
+Intro.Size = UDim2.new(1,0,1,0)
+Intro.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Intro.Text = "👑 KING HUB 👑"
+Intro.TextColor3 = Color3.fromRGB(255,255,255)
+Intro.TextScaled = true
+Intro.Font = Enum.Font.GothamBlack
+
+TweenService:Create(Intro, TweenInfo.new(1), {
+    TextColor3 = Color3.fromHSV(0,1,1)
+}):Play()
+
+task.wait(2)
+
+TweenService:Create(Intro, TweenInfo.new(1), {
+    TextTransparency = 1,
+    BackgroundTransparency = 1
+}):Play()
+
+task.wait(1)
+Intro:Destroy()
+
+-- =========================
 -- PANEL
+-- =========================
+
 local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.Size = UDim2.new(0, PANEL_WIDTH, 0, PANEL_HEIGHT)
-MainFrame.Position = UDim2.new(0.5, -PANEL_WIDTH/2, 0.5, -PANEL_HEIGHT/2)
+MainFrame.Size = UDim2.new(0, 360, 0, 480)
+MainFrame.Position = UDim2.new(0.5, -180, 0.5, -240)
 MainFrame.BackgroundColor3 = Color3.fromRGB(20,20,20)
 MainFrame.Active = true
 MainFrame.Draggable = true
 
+Instance.new("UICorner", MainFrame)
 local Stroke = Instance.new("UIStroke", MainFrame)
 Stroke.Thickness = 4
-Instance.new("UICorner", MainFrame)
 
 -- BAŞLIQ
 local Title = Instance.new("TextLabel", MainFrame)
 Title.Size = UDim2.new(1,0,0,40)
-Title.Text = "👑 KING HUB | PREMIUM"
+Title.Text = "👑 KING HUB | PRO"
 Title.BackgroundTransparency = 1
 Title.TextColor3 = Color3.fromRGB(255,255,255)
 Title.TextSize = 20
 
--- INPUT BOX FUNKSİYASI
-local function CreateInput(placeholder, pos)
-    local box = Instance.new("TextBox", MainFrame)
-    box.Size = UDim2.new(0,300,0,40)
-    box.Position = pos
-    box.PlaceholderText = placeholder
-    box.Text = ""
-    box.BackgroundColor3 = Color3.fromRGB(30,30,30)
-    box.TextColor3 = Color3.fromRGB(255,255,255)
-    box.TextSize = 18
-    Instance.new("UICorner", box)
-    return box
+-- BUTTON FUNKSİYASI
+local function btn(text, y, func)
+    local b = Instance.new("TextButton", MainFrame)
+    b.Size = UDim2.new(0,300,0,40)
+    b.Position = UDim2.new(0.5,-150,0,y)
+    b.Text = text
+    b.BackgroundColor3 = Color3.fromRGB(35,35,35)
+    b.TextColor3 = Color3.fromRGB(255,255,255)
+    b.TextSize = 18
+    Instance.new("UICorner", b)
+    b.MouseButton1Click:Connect(func)
 end
 
--- SPEED INPUT
-local speedBox = CreateInput("Speed yaz (məs: 120)", UDim2.new(0.5,-150,0,60))
+-- SPEED
+btn("Speed +10", 50, function()
+    player.Character.Humanoid.WalkSpeed += 10
+end)
 
-local speedBtn = Instance.new("TextButton", MainFrame)
-speedBtn.Size = UDim2.new(0,300,0,40)
-speedBtn.Position = UDim2.new(0.5,-150,0,110)
-speedBtn.Text = "Speed Aktiv Et"
-speedBtn.BackgroundColor3 = Color3.fromRGB(35,35,35)
-speedBtn.TextColor3 = Color3.fromRGB(255,255,255)
-speedBtn.TextSize = 18
-Instance.new("UICorner", speedBtn)
+btn("Speed -10", 100, function()
+    player.Character.Humanoid.WalkSpeed -= 10
+end)
 
-speedBtn.MouseButton1Click:Connect(function()
-    local val = tonumber(speedBox.Text)
-    if val then
-        player.Character.Humanoid.WalkSpeed = val
+-- JUMP
+btn("Jump +10", 150, function()
+    player.Character.Humanoid.JumpPower += 10
+end)
+
+btn("Jump -10", 200, function()
+    player.Character.Humanoid.JumpPower -= 10
+end)
+
+-- FLY
+local fly = false
+btn("Fly (Toggle)", 250, function()
+    fly = not fly
+end)
+
+RunService.RenderStepped:Connect(function()
+    if fly and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.Velocity = Vector3.new(0,50,0)
     end
 end)
 
--- JUMP INPUT
-local jumpBox = CreateInput("Jump yaz (məs: 100)", UDim2.new(0.5,-150,0,160))
+-- ESP
+local espOn = false
 
-local jumpBtn = Instance.new("TextButton", MainFrame)
-jumpBtn.Size = UDim2.new(0,300,0,40)
-jumpBtn.Position = UDim2.new(0.5,-150,0,210)
-jumpBtn.Text = "Jump Aktiv Et"
-jumpBtn.BackgroundColor3 = Color3.fromRGB(35,35,35)
-jumpBtn.TextColor3 = Color3.fromRGB(255,255,255)
-jumpBtn.TextSize = 18
-Instance.new("UICorner", jumpBtn)
+local function addESP(char)
+    if char:FindFirstChild("Highlight") then return end
+    local h = Instance.new("Highlight", char)
+    h.FillTransparency = 0.5
+end
 
-jumpBtn.MouseButton1Click:Connect(function()
-    local val = tonumber(jumpBox.Text)
-    if val then
-        player.Character.Humanoid.JumpPower = val
-    end
+btn("RGB ESP (Toggle)", 300, function()
+    espOn = not espOn
 end)
 
--- PLATFORM (ARTIQ ARXAYA ATMIR)
-local platformOn = false
-
-local platBtn = Instance.new("TextButton", MainFrame)
-platBtn.Size = UDim2.new(0,300,0,40)
-platBtn.Position = UDim2.new(0.5,-150,0,260)
-platBtn.Text = "RGB Platform (Toggle)"
-platBtn.BackgroundColor3 = Color3.fromRGB(35,35,35)
-platBtn.TextColor3 = Color3.fromRGB(255,255,255)
-platBtn.TextSize = 18
-Instance.new("UICorner", platBtn)
-
-platBtn.MouseButton1Click:Connect(function()
-    platformOn = not platformOn
-end)
-
-game:GetService("RunService").RenderStepped:Connect(function()
-    if platformOn and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        
-        local root = player.Character.HumanoidRootPart
-        
-        if player.Character.Humanoid.FloorMaterial == Enum.Material.Air then
-            local p = Instance.new("Part", workspace)
-            p.Size = Vector3.new(8,0.5,8)
-            p.Anchored = true
-            p.CFrame = root.CFrame * CFrame.new(0,-3,0)
-            p.Color = Color3.fromHSV(tick()%5/5,1,1)
-            p.Material = Enum.Material.Neon
-            task.wait(0.1)
-            p:Destroy()
+RunService.RenderStepped:Connect(function()
+    if espOn then
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= player and plr.Character then
+                addESP(plr.Character)
+                local h = plr.Character:FindFirstChild("Highlight")
+                if h then
+                    h.FillColor = Color3.fromHSV(tick()%5/5,1,1)
+                end
+            end
         end
     end
-end)
-
--- TOGGLE DÜYMƏ
-local ToggleBtn = Instance.new("TextButton", ScreenGui)
-ToggleBtn.Size = UDim2.new(0,60,0,60)
-ToggleBtn.Position = UDim2.new(0.5,-30,0,20)
-ToggleBtn.Text = "👑"
-ToggleBtn.TextSize = 35
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(25,25,25)
-ToggleBtn.TextColor3 = Color3.fromRGB(255,255,255)
-Instance.new("UICorner", ToggleBtn)
-
-ToggleBtn.MouseButton1Click:Connect(function()
-    MainFrame.Visible = not MainFrame.Visible
 end)
 
 -- RGB BORDER
