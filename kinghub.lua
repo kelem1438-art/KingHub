@@ -1,96 +1,107 @@
--- Kavo Library (Ən stabil versiya)
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("👑 KING HUB | PREMIUM RGB", "DarkScene")
+-- KÖHNƏ QALIQLARI TƏMİZLƏMƏK
+for _, v in pairs(game.CoreGui:GetChildren()) do
+    if v.Name == "KingHubCustom" then v:Destroy() end
+end
 
--- --- TABS ---
-local Main = Window:NewTab("Əsas Menu")
-local Movement = Window:NewTab("Hərəkət")
-local Visuals = Window:NewTab("Görünüş")
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+ScreenGui.Name = "KingHubCustom"
 
--- --- SECTIONS (Düymələrin görünməsi üçün mütləqdir!) ---
-local MainSection = Main:NewSection("Script Yükləyici")
-local MoveSection = Movement:NewSection("Safe Mods")
-local VisualSection = Visuals:NewSection("ESP & Visuals")
+-- --- ƏSAS PANEL ---
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 350, 0, 250)
+MainFrame.Position = UDim2.new(0.5, -175, 0.5, -125)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true -- Paneli sürüşdürə bilərsən
 
--- --- ƏSAS MENU ---
-MainSection:NewButton("P8eK5qd2 Scriptini İşə Sal", "Özəl scripti aktiv edir", function()
-    pcall(function()
-        loadstring(game:HttpGet("https://pastebin.com/raw/P8eK5qd2"))()
-    end)
+local Corner = Instance.new("UICorner", MainFrame)
+local Stroke = Instance.new("UIStroke", MainFrame)
+Stroke.Thickness = 4
+
+-- BAŞLIQ
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Text = "👑 KING HUB | PREMIUM"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 20
+Title.BackgroundTransparency = 1
+
+-- --- DÜYMƏLƏR (MÜTLƏQ GÖRÜNƏN) ---
+local function CreateButton(name, pos, callback)
+    local btn = Instance.new("TextButton", MainFrame)
+    btn.Size = UDim2.new(0, 300, 0, 40)
+    btn.Position = pos
+    btn.Text = name
+    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 18
+    Instance.new("UICorner", btn)
+    btn.MouseButton1Click:Connect(callback)
+    return btn
+end
+
+-- 1. SCRIPT YÜKLƏ
+CreateButton("Scripti İşə Sal (P8eK5qd2)", UDim2.new(0.5, -150, 0, 50), function()
+    pcall(function() loadstring(game:HttpGet("https://pastebin.com/raw/P8eK5qd2"))() end)
 end)
 
--- --- HƏRƏKƏT (SAFE MODE - Atılmamaq üçün) ---
-MoveSection:NewSlider("Sürət (Speed)", "Limit: 100 (Atılmamaq üçün)", 100, 16, function(s)
-    pcall(function()
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = s
-    end)
+-- 2. SAFE SPEED (100)
+CreateButton("Sürət Aktiv Et (100 Speed)", UDim2.new(0.5, -150, 0, 100), function()
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100
 end)
 
-MoveSection:NewSlider("Tullanış (Jump)", "Limit: 120", 120, 50, function(s)
-    pcall(function()
-        game.Players.LocalPlayer.Character.Humanoid.JumpPower = s
-    end)
-end)
-
--- 🌈 RGB PLATFORM
-local plat_toggle = false
-MoveSection:NewToggle("RGB Platform", "Tullananda blok yaradır", function(state)
-    plat_toggle = state
-    game:GetService("RunService").RenderStepped:Connect(function()
-        if plat_toggle and game.Players.LocalPlayer.Character.Humanoid.FloorMaterial == Enum.Material.Air then
-            local p = Instance.new("Part", workspace)
-            p.Size = Vector3.new(8, 0.5, 8)
-            p.Anchored = true
-            p.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, -3.2, 0)
-            p.Transparency = 0.5
-            p.Color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
-            task.wait(0.1)
-            p:Destroy()
-        end
-    end)
-end)
-
--- --- ESP ---
-VisualSection:NewButton("RGB ESP Aktiv Et", "Oyunçuları divar arxasından gör", function()
+-- 3. ESP AKTİV ET
+CreateButton("RGB ESP (Oyunçuları Gör)", UDim2.new(0.5, -150, 0, 150), function()
     for _, v in pairs(game.Players:GetChildren()) do
         if v.Name ~= game.Players.LocalPlayer.Name and v.Character then
-            pcall(function()
-                local h = Instance.new("Highlight", v.Character)
-                h.FillColor = Color3.fromHSV(tick() % 5 / 5, 1, 1)
-                h.OutlineColor = Color3.fromRGB(255, 255, 255)
-            end)
+            local h = Instance.new("Highlight", v.Character)
+            h.FillColor = Color3.fromHSV(tick() % 5 / 5, 1, 1)
         end
     end
 end)
 
--- --- 🖱️ YUXARI YUMRU RGB DÜYMƏ (PANELİ AÇIB-BAĞLAMAQ) ---
-local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
-ScreenGui.Name = "KingHubRealGui"
-
-local ToggleBtn = Instance.new("TextButton", ScreenGui)
-ToggleBtn.Size = UDim2.new(0, 55, 0, 55)
-ToggleBtn.Position = UDim2.new(0.5, -27, 0, 15)
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-ToggleBtn.Text = "👑"
-ToggleBtn.TextSize = 30
-ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleBtn.ZIndex = 1000
-
-local Corner = Instance.new("UICorner", ToggleBtn)
-Corner.CornerRadius = UDim.new(1, 0)
-
-local Stroke = Instance.new("UIStroke", ToggleBtn)
-Stroke.Thickness = 3
-
-ToggleBtn.MouseButton1Click:Connect(function()
-    Library:ToggleUI()
+-- 4. RGB PLATFORM
+local plat_toggle = false
+CreateButton("RGB Platform (Toggle)", UDim2.new(0.5, -150, 0, 200), function()
+    plat_toggle = not plat_toggle
+    if plat_toggle then
+        game:GetService("RunService").RenderStepped:Connect(function()
+            if plat_toggle and game.Players.LocalPlayer.Character.Humanoid.FloorMaterial == Enum.Material.Air then
+                local p = Instance.new("Part", workspace)
+                p.Size = Vector3.new(8, 0.5, 8)
+                p.Anchored = true
+                p.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, -3.2, 0)
+                p.Color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+                task.wait(0.1)
+                p:Destroy()
+            end
+        end)
+    end
 end)
 
--- ✨ FULL RGB PANEL & BUTTON SYSTEM
+-- --- 🖱️ AÇMA/BAĞLAMA DÜYMƏSİ ---
+local ToggleBtn = Instance.new("TextButton", ScreenGui)
+ToggleBtn.Size = UDim2.new(0, 60, 0, 60)
+ToggleBtn.Position = UDim2.new(0.5, -30, 0, 20)
+ToggleBtn.Text = "👑"
+ToggleBtn.TextSize = 35
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1, 0)
+local TStroke = Instance.new("UIStroke", ToggleBtn)
+TStroke.Thickness = 4
+
+ToggleBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
+-- ✨ FULL RGB LOOP
 task.spawn(function()
-    while task.wait(0.1) do
+    while task.wait() do
         local color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
-        Window:ChangeColor("Main", color) -- Panelin tillərini RGB edir
-        Stroke.Color = color -- Düymənin kənarını RGB edir
+        Stroke.Color = color
+        TStroke.Color = color
+        Title.TextColor3 = color
     end
 end)
